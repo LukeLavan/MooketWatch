@@ -1,12 +1,20 @@
-import { Component } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { Component, effect, OnInit } from '@angular/core';
+import { MooketDataServiceService } from './services/MooketDataService.service';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet],
+  imports: [],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss'
 })
 export class AppComponent {
-  title = 'MooketWatch';
+  constructor(private readonly mooketDataService: MooketDataServiceService) {
+    effect(()=>{
+      const databaseReady = mooketDataService.databaseReady();
+
+      if(databaseReady){
+        mooketDataService.testDatabase();
+      }
+    })
+  }
 }
