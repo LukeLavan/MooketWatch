@@ -19,17 +19,38 @@ body {
     background-color: black;
 
     color: white;
+    font-family: Roboto, 'Helvetica Neue', sans-serif;
 
     height: 100vh;
 
     margin: 0;
     padding: 0;
 }
-html,
-body {
-    height: 100%;
+
+.highlight {
+    font-weight: bold;
 }
-body {
-    margin: 0;
-    font-family: Roboto, 'Helvetica Neue', sans-serif;
+
+mat-form-field[appearance='outline'] {
+    @include mat.form-field-overrides(
+        (
+            outlined-label-text-color: white,
+            outlined-hover-label-text-color: grey,
+            outlined-input-text-color: white,
+            outlined-outline-color: grey,
+            outlined-hover-outline-color: white,
+
+            outlined-error-hover-outline-color: pink,
+            outlined-error-hover-label-text-color: pink,
+            outlined-error-focus-outline-color: pink,
+        )
+    );
+}
+
+mat-select {
+    @include mat.select-overrides(
+        (
+            enabled-trigger-text-color: white,
+        )
+    );
 }

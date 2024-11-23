@@ -9,12 +9,10 @@
     > .break {
         flex-basis: 100%;
     }
-
-    > .grow {
-        flex-grow: 1;
-    }
 }
-
+.grow {
+    flex-grow: 1;
+}
 .margin-right {
     margin-right: 8px;
 }
@@ -22,4 +20,15 @@
 .remove {
     color: red;
     border: thin solid red;
+}
+
+.form-field- {
+    &type {
+        width: 120px;
+    }
+
+    &min,
+    &max {
+        width: 120px;
+    }
 }

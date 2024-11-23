@@ -35,27 +35,37 @@ export class MooketDataService {
     sqlQuery = computed(() => {
         const currentLines = this.plotConfigService.currentLines();
 
-        const expressionWithSelects = currentLines
-            .filter(line => line.type === 'expression')
+        const expressionWithSelects: string[] = currentLines
+            .filter(line => {
+                return line.type === 'expression' && line.value.length > 0;
+            })
             .map(line => {
                 return `${line.value} as ${line.label}`;
             });
 
-        const lineSelections = currentLines.map(line => {
-            if (line.type === 'item') {
-                return `CASE WHEN "${line.value}" > ${line.max} OR "${line.value}" < ${line.min} THEN -1 ELSE "${line.value}" END AS "${line.label}"`;
-            } else {
-                // return `expressions.${line.label}`; // skips CASE min/max checks
-                return `CASE WHEN expressions.${line.label} > ${line.max} OR expressions.${line.label} < ${line.min} THEN -1 ELSE expressions.${line.label} END AS "${line.label}"`;
-            }
-        });
+        const lineSelections = currentLines
+            .filter(line => {
+                return line.value.length > 0;
+            })
+            .map(line => {
+                if (line.type === 'item') {
+                    return `CASE WHEN "${line.value}" > ${line.max} OR "${line.value}" < ${line.min} THEN -1 ELSE "${line.value}" END AS "${line.label}"`;
+                } else {
+                    // return `expressions.${line.label}`; // skips CASE min/max checks
+                    return `CASE WHEN expressions.${line.label} > ${line.max} OR expressions.${line.label} < ${line.min} THEN -1 ELSE expressions.${line.label} END AS "${line.label}"`;
+                }
+            });
 
         expressionWithSelects.unshift('time');
         lineSelections.unshift(`DATETIME(ask.time, "unixepoch") AS time`);
 
-        const query = `WITH expressions AS (SELECT ${expressionWithSelects.join(
+        const withClause = `WITH expressions AS (SELECT ${expressionWithSelects.join(
             ', ',
-        )} from ask) SELECT ${lineSelections.join(
+        )} from ask)`;
+
+        const query = `${
+            expressionWithSelects.length > 0 ? withClause : ''
+        } SELECT ${lineSelections.join(
             ', ',
         )} FROM ask LEFT JOIN expressions ON ask.time = expressions.time;`;
 
@@ -118,15 +128,18 @@ export class MooketDataService {
         if (response) {
             // Extract item names from the columns array, excluding the 'time' column
             this.plotConfigService.items = response.columns.slice(1);
+            this.plotConfigService.itemsReady.set(true);
         }
     }
 
     executeQuery(query: string): void {
         if (!this.databaseReady() || !this.database) return;
 
+        console.log(query);
+
         const response = this.database.exec(query)[0] as DbResponse;
 
-        console.log(query, response);
+        console.log(response);
 
         this.lastResponse.set(response);
     }

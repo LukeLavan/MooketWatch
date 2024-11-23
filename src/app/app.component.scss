@@ -1,7 +1,23 @@
 :host {
-    display: flex;
-
-    height: 100%;
+    height: calc(100% - 16px);
 
     padding: 8px;
+}
+
+.header {
+    height: 32px;
+    border-bottom: thin solid white;
+    margin-bottom: 24px;
+    padding-bottom: 8px;
+}
+
+.flex {
+    display: flex;
+
+    height: calc(100% - 120px);
+}
+
+.controls {
+    flex-grow: 1;
+    flex-shrink: 1;
 }

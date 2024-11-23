@@ -48,6 +48,7 @@ export class PlotConfigService {
      * Set during loading by `MooketDataServiceService.fetchItems()`
      */
     items?: string[];
+    itemsReady = signal(false);
 
     /**
      * Updated by `PlotControlsComponent`

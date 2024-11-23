@@ -1,6 +1,6 @@
 <div class="flex">
     <!-- Type -->
-    <mat-form-field class="margin-right">
+    <mat-form-field class="margin-right form-field-type" appearance="outline">
         <mat-label>Type</mat-label>
         <mat-select [formControl]="formGroup().controls.type">
             <mat-option value="item">Item</mat-option>
@@ -10,7 +10,7 @@
 
     <!-- Label -->
     @if(formGroup().value.type === 'expression'){
-    <mat-form-field>
+    <mat-form-field class="" appearance="outline">
         <mat-label>Label</mat-label>
         <input matInput [formControl]="formGroup().controls.label" />
     </mat-form-field>
@@ -19,34 +19,38 @@
     }
 
     <!-- Value -->
-    <mat-form-field [ngClass]="{ grow: formGroup().value.type === 'expression' }">
+    <mat-form-field class="grow" appearance="outline">
         <mat-label>Value</mat-label>
-        @if(formGroup().value.type === 'item'){
 
-        <mat-autocomplete #auto="matAutocomplete" (optionSelected)="onItemSelect($event)">
-            @for(item of plotConfigService.items; track $index){
+        @if(formGroup().value.type === 'item'){
+        <mat-autocomplete
+            #auto="matAutocomplete"
+            (optionSelected)="onItemSelect($event.option.value)">
+            @for(item of filteredItems(); track $index){
             <mat-option [value]="item">
-                {{ item }}
+                <span [innerHtml]="item | highlightSearch : itemSearch.value"></span>
             </mat-option>
             }
         </mat-autocomplete>
         <input matInput [matAutocomplete]="auto" [formControl]="itemSearch" />
         } @else {
-        <input matInput [formControl]="formGroup().controls.value" />
-
+        <textarea
+            cdkTextareaAutosize
+            matInput
+            [formControl]="formGroup().controls.value"></textarea>
         }
     </mat-form-field>
 </div>
 
 <div class="flex">
     <!-- Min -->
-    <mat-form-field class="margin-right">
+    <mat-form-field class="form-field-min margin-right" appearance="outline">
         <mat-label>Min</mat-label>
         <input matInput [formControl]="formGroup().controls.min" type="number" />
     </mat-form-field>
 
     <!-- Max -->
-    <mat-form-field class="margin-right">
+    <mat-form-field class="form-field-max margin-right" appearance="outline">
         <mat-label>Max</mat-label>
         <input matInput [formControl]="formGroup().controls.max" type="number" />
     </mat-form-field>
