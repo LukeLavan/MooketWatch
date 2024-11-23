@@ -7,9 +7,15 @@ import { provideHttpClient } from '@angular/common/http';
 import { Chart } from 'chart.js';
 import zoomPlugin from 'chartjs-plugin-zoom';
 import 'chartjs-adapter-date-fns';
+import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 
 Chart.register(zoomPlugin);
 
 export const appConfig: ApplicationConfig = {
-  providers: [provideZoneChangeDetection({ eventCoalescing: true }), provideRouter(routes), provideHttpClient()]
+    providers: [
+        provideZoneChangeDetection({ eventCoalescing: true }),
+        provideRouter(routes),
+        provideHttpClient(),
+        provideAnimationsAsync(),
+    ],
 };

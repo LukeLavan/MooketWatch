@@ -1,0 +1,58 @@
+<div class="flex">
+    <!-- Type -->
+    <mat-form-field class="margin-right">
+        <mat-label>Type</mat-label>
+        <mat-select [formControl]="formGroup().controls.type">
+            <mat-option value="item">Item</mat-option>
+            <mat-option value="expression">Expr</mat-option>
+        </mat-select>
+    </mat-form-field>
+
+    <!-- Label -->
+    @if(formGroup().value.type === 'expression'){
+    <mat-form-field>
+        <mat-label>Label</mat-label>
+        <input matInput [formControl]="formGroup().controls.label" />
+    </mat-form-field>
+
+    <div class="break"></div>
+    }
+
+    <!-- Value -->
+    <mat-form-field [ngClass]="{ grow: formGroup().value.type === 'expression' }">
+        <mat-label>Value</mat-label>
+        @if(formGroup().value.type === 'item'){
+
+        <mat-autocomplete #auto="matAutocomplete" (optionSelected)="onItemSelect($event)">
+            @for(item of plotConfigService.items; track $index){
+            <mat-option [value]="item">
+                {{ item }}
+            </mat-option>
+            }
+        </mat-autocomplete>
+        <input matInput [matAutocomplete]="auto" [formControl]="itemSearch" />
+        } @else {
+        <input matInput [formControl]="formGroup().controls.value" />
+
+        }
+    </mat-form-field>
+</div>
+
+<div class="flex">
+    <!-- Min -->
+    <mat-form-field class="margin-right">
+        <mat-label>Min</mat-label>
+        <input matInput [formControl]="formGroup().controls.min" type="number" />
+    </mat-form-field>
+
+    <!-- Max -->
+    <mat-form-field class="margin-right">
+        <mat-label>Max</mat-label>
+        <input matInput [formControl]="formGroup().controls.max" type="number" />
+    </mat-form-field>
+
+    <!-- Remove Button -->
+    <button mat-icon-button (click)="remove.emit()" type="button" class="remove">
+        <mat-icon>remove</mat-icon>
+    </button>
+</div>

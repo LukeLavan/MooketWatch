@@ -1,0 +1,15 @@
+@if(plotConfigService.isZoomed()){
+<button (click)="plotConfigService.resetZoom()">Reset Zoom</button>
+}
+
+<form>
+    @for(line of lines.controls; track $index) {
+    <line-controls class="line" [formGroup]="line" (remove)="removeLine($index)" />
+    }
+
+    <button mat-icon-button (click)="addLine()" type="button">
+        <mat-icon>add</mat-icon>
+    </button>
+</form>
+
+<button mat-flat-button (click)="runQuery()" type="button">Query</button>
