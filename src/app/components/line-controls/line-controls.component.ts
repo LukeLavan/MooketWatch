@@ -9,28 +9,18 @@ import {
     output,
 } from '@angular/core';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
-import {
-    ControlValueAccessor,
-    FormBuilder,
-    FormControl,
-    FormGroup,
-    NG_VALUE_ACCESSOR,
-    ReactiveFormsModule,
-} from '@angular/forms';
-import {
-    MatAutocompleteModule,
-    MatAutocompleteSelectedEvent,
-} from '@angular/material/autocomplete';
+import { FormControl, NG_VALUE_ACCESSOR, ReactiveFormsModule, Validators } from '@angular/forms';
+import { MatAutocompleteModule } from '@angular/material/autocomplete';
+import { MatButtonModule } from '@angular/material/button';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
-import { Line, PlotConfigService } from '../../services/PlotConfig.service';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { LineFormGroup } from '../plot-controls/plot-controls.component';
-import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon';
-import { NgClass } from '@angular/common';
-import { distinctUntilChanged, filter, map, merge, startWith } from 'rxjs';
+import { distinctUntilChanged, filter, map, merge } from 'rxjs';
 import { HighlightSearchPipe } from '../../pipes/HighlightSearch.pipe';
+import { PlotConfigService } from '../../services/PlotConfig.service';
+import { LineFormGroup } from '../plot-controls/plot-controls.component';
+import { ExpressionValidation } from '../../utils/ExpressionValidation.utils';
 
 @Component({
     selector: 'line-controls',
@@ -56,6 +46,7 @@ import { HighlightSearchPipe } from '../../pipes/HighlightSearch.pipe';
     ],
 })
 export class LineControlsComponent implements OnInit {
+    Object = Object;
     formGroup = input.required<LineFormGroup>();
 
     itemSearch = new FormControl('', { nonNullable: true });
@@ -93,6 +84,7 @@ export class LineControlsComponent implements OnInit {
     constructor(
         protected readonly plotConfigService: PlotConfigService,
         private readonly destroyRef: DestroyRef,
+        private readonly expressionValidationService: ExpressionValidation,
     ) {
         // load initial value into search field and load autocomplete items once when items are ready
         const itemsLoading = effect(() => {
@@ -112,8 +104,12 @@ export class LineControlsComponent implements OnInit {
             .subscribe(newType => {
                 if (newType === 'item') {
                     this.formGroup().controls.label.disable();
+                    this.formGroup().controls.table.setValue('ask');
+                    this.formGroup().controls.table.enable();
                 } else {
                     this.formGroup().controls.label.enable();
+                    this.formGroup().controls.table.setValue('');
+                    this.formGroup().controls.table.disable();
                 }
             });
 
@@ -127,8 +123,17 @@ export class LineControlsComponent implements OnInit {
             });
 
         // keep itemSelected up to date on user input
-        this.itemSearch.valueChanges.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => {
-            this.itemSelected.emit(false);
+        this.itemSearch.valueChanges.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((search) => {
+            if(this.plotConfigService.items?.includes(search)) {
+                // manually typed in a valid name
+                this.itemSelected.emit(true);
+                this.onItemSelect(search);
+            } else {
+                // search does not match any item
+                this.itemSelected.emit(false);
+                this.formGroup().controls.value.reset();
+                this.formGroup().controls.label.setValue(search);
+            }
         });
 
         // mark value field with error when item not selected
@@ -137,6 +142,12 @@ export class LineControlsComponent implements OnInit {
                 this.formGroup().controls.value.setErrors({ required: true });
                 this.itemSearch.setErrors({ required: true });
             }
+        });
+
+        // set visual error state on value form field when entire line is invalid
+        this.formGroup().statusChanges.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => {
+            this.formGroup().controls.value.setErrors(this.formGroup().errors, {emitEvent: false});
+            this.itemSearch.setErrors(this.formGroup().errors, {emitEvent: false});
         });
     }
 

@@ -1,7 +1,7 @@
-import { Component, effect, ElementRef, input, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 
 import { Chart } from 'chart.js/auto';
-import { DbResponse, MooketDataService } from '../../services/MooketData.service';
+import { MooketDataService } from '../../services/MooketData.service';
 import { PlotConfigService } from '../../services/PlotConfig.service';
 
 @Component({

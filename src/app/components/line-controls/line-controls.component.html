@@ -9,37 +9,44 @@
     </mat-form-field>
 
     <!-- Label -->
-    @if(formGroup().value.type === 'expression'){
-    <mat-form-field class="" appearance="outline">
-        <mat-label>Label</mat-label>
-        <input matInput [formControl]="formGroup().controls.label" />
-    </mat-form-field>
+    @if (formGroup().value.type === 'expression') {
+        <mat-form-field class="" appearance="outline">
+            <mat-label>Label</mat-label>
+            <input matInput [formControl]="formGroup().controls.label" />
+        </mat-form-field>
 
-    <div class="break"></div>
+        <div class="break"></div>
     }
 
     <!-- Value -->
     <mat-form-field class="grow" appearance="outline">
         <mat-label>Value</mat-label>
 
-        @if(formGroup().value.type === 'item'){
-        <mat-autocomplete
-            #auto="matAutocomplete"
-            (optionSelected)="onItemSelect($event.option.value)">
-            @for(item of filteredItems(); track $index){
-            <mat-option [value]="item">
-                <span [innerHtml]="item | highlightSearch : itemSearch.value"></span>
-            </mat-option>
-            }
-        </mat-autocomplete>
-        <input matInput [matAutocomplete]="auto" [formControl]="itemSearch" />
+        @if (formGroup().value.type === 'item') {
+            <mat-autocomplete
+                #auto="matAutocomplete"
+                (optionSelected)="onItemSelect($event.option.value)">
+                @for (item of filteredItems(); track $index) {
+                    <mat-option [value]="item">
+                        <span [innerHtml]="item | highlightSearch: itemSearch.value"></span>
+                    </mat-option>
+                }
+            </mat-autocomplete>
+            <input matInput [matAutocomplete]="auto" [formControl]="itemSearch" />
         } @else {
-        <textarea
-            cdkTextareaAutosize
-            matInput
-            [formControl]="formGroup().controls.value"></textarea>
+            <textarea
+                cdkTextareaAutosize
+                matInput
+                [formControl]="formGroup().controls.value"></textarea>
         }
     </mat-form-field>
+    @if (formGroup().errors?.['length'] > 0) {
+        @for (error of Object.keys(formGroup().errors!); track $index) {
+            <mat-error>
+                {{ formGroup().errors![error]! }}
+            </mat-error>
+        }
+    }
 </div>
 
 <div class="flex">
@@ -54,6 +61,17 @@
         <mat-label>Max</mat-label>
         <input matInput [formControl]="formGroup().controls.max" type="number" />
     </mat-form-field>
+
+    <!-- Table -->
+    @if (formGroup().value.type === 'item') {
+        <mat-form-field class="form-field-table margin-right" appearance="outline">
+            <mat-label>Table</mat-label>
+            <mat-select [formControl]="formGroup().controls.table">
+                <mat-option value="bid">Bid</mat-option>
+                <mat-option value="ask">Ask</mat-option>
+            </mat-select>
+        </mat-form-field>
+    }
 
     <!-- Remove Button -->
     <button mat-icon-button (click)="remove.emit()" type="button" class="remove">
